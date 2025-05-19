@@ -10,17 +10,15 @@ const awsmobile = {
         "scope": [
             "email",
             "openid",
+            "profile",
             "phone"
-            // Add "profile" and "aws.cognito.signin.user.admin" if you have enabled them
-            // in your Cognito App Client (2at8gurmc6457b7l2iib3ikf6b) "Allowed OAuth Scopes"
-            // AND if your application actually needs these scopes.
         ],
         // CRITICAL: Add all origins your app will run on.
         // Amplify will pick the one that matches the current window.location.origin
         // to use as the redirect_uri when calling Cognito's /authorize endpoint.
         // This chosen redirect_uri MUST be in Cognito App Client's "Allowed Callback URLs".
-        "redirectSignIn": "http://localhost:3000/,https://enduku.life",
-        "redirectSignOut": "http://localhost:3000/login/,https://enduku.life/login",
+        "redirectSignIn": "http://localhost:3000/",
+        "redirectSignOut": "http://localhost:3000/login/",
         "responseType": "code"
     },
     "federationTarget": "COGNITO_USER_POOLS",

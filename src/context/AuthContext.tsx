@@ -37,18 +37,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true); // Start true for initial app load check
 
     const checkAuthState = async () => {
-        // setIsLoading(true); // Only set true for initial load, not for every check
         try {
             const cognitoUser = await getCurrentUser();
-            const attributes = await fetchUserAttributes();
-            const fullUser = { ...cognitoUser, attributes };
-            setUser(fullUser);
-            setIsAuthenticated(true);
+            if (!cognitoUser) {
+                setUser(null);
+                setIsAuthenticated(false);
+                return;
+            }
+
+            try {
+                const attributes = await fetchUserAttributes();
+                const fullUser = { ...cognitoUser, attributes };
+                setUser(fullUser);
+                setIsAuthenticated(true);
+            } catch (attrError) {
+                console.error('Error fetching user attributes:', attrError);
+                // If we can't fetch attributes but have a user, still consider them authenticated
+                setUser(cognitoUser);
+                setIsAuthenticated(true);
+            }
         } catch (error) {
+            console.error('Error checking auth state:', error);
             setUser(null);
             setIsAuthenticated(false);
         } finally {
-            setIsLoading(false); // Always set to false after check completes
+            setIsLoading(false);
         }
     };
 
@@ -118,8 +131,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const signOut = async () => {
+        console.log('Signing out...');
         try {
             await amplifySignOut({ global: true });
+            console.log('Sign out successful');
             setUser(null);
             setIsAuthenticated(false);
         } catch (error) {
